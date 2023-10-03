@@ -1,0 +1,78 @@
+import pygame
+import sys
+from random import *
+
+# 초기화
+pygame.init()
+
+# 화면 크기 및 색상 정의
+WIDTH, HEIGHT = 800, 600
+
+
+# 문자열 속도와 위치 설정
+string_speed = 0.1
+string_x = randint(0,WIDTH)
+string_y = 0
+
+# 화면 설정
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("영타 연습 게임")
+
+# 폰트 설정
+font = pygame.font.Font(None, 36)
+
+# 미리 입력한 문자열
+predefined_string = "HelloWorld"
+user_input = ""
+score = 0
+typing = False
+
+def draw_text(text, color, x, y):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, (x, y))
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            elif typing:
+                if event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+                elif event.key == pygame.K_RETURN:
+                    if user_input == predefined_string:
+                        score += 1
+                    user_input = ""
+                else:
+                    user_input += event.unicode
+
+    screen.fill((255,255,255))
+
+    if typing:
+        draw_text("타이핑 중...", (124,252,0), 10, 10)
+        draw_text(user_input, (255,0,0), 10, 50)
+    else:
+        draw_text("영타 연습 게임",(124,252,0), 10, 10)
+        draw_text("시작하려면 Enter를 누르세요.", (124,252,0), 10, 50)
+
+    draw_text(f"점수: {score}", (124,252,0), 10, HEIGHT - 40)
+
+    # 문자열을 아래로 이동
+    if typing:
+        string_y += string_speed
+        if string_y > HEIGHT:
+            string_y = 0
+            predefined_string = "HelloWorld"  # 다음 문자열로 교체
+        draw_text(predefined_string, (124,252,0), string_x, string_y)
+
+    pygame.display.flip()
+
+    if not typing and pygame.key.get_pressed()[pygame.K_RETURN]:
+        typing = True
+
+# 게임 종료
+pygame.quit()
+sys.exit()
